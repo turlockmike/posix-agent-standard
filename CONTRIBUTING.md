@@ -416,7 +416,7 @@ We are committed to providing a welcoming and inclusive environment.
 
 If you experience or witness unacceptable behavior:
 - **Public incidents:** Comment on the thread to de-escalate
-- **Private concerns:** Email conduct@posix-agents.org *(placeholder)*
+- **Private concerns:** Report via [GitHub Issues](https://github.com/turlockmike/posix-agent-standard/issues) (maintainers can see private communications)
 
 ---
 
@@ -455,8 +455,7 @@ Authors are credited in their case study files and linked from README.
 ## Questions?
 
 - **Specification questions:** [Open a discussion](https://github.com/turlockmike/posix-agent-standard/discussions)
-- **Implementation help:** [Join our Discord](https://discord.gg/posix-agents) *(placeholder)*
-- **Email:** hello@posix-agents.org *(placeholder)*
+- **Bug reports:** [Open an issue](https://github.com/turlockmike/posix-agent-standard/issues)
 
 ---
 

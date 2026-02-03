@@ -600,7 +600,6 @@ Inspired by:
 
 - **Specification Issues:** [GitHub Issues](https://github.com/turlockmike/posix-agent-standard/issues)
 - **General Discussion:** [GitHub Discussions](https://github.com/turlockmike/posix-agent-standard/discussions)
-- **Email:** hello@posix-agents.org *(placeholder)*
 
 ---
 
