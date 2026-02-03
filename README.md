@@ -353,6 +353,8 @@ print(f"Token reduction: {(baseline - posix) / baseline * 100}%")
 
 📐 **[Read the Specification](./SPECIFICATION.md)** - Technical requirements for implementers (30 min read)
 
+🔗 **[Skills Integration Guide](./SKILLS-INTEGRATION.md)** - How PAS works with Agent Skills frameworks (20 min read)
+
 🎯 **[See Examples](./examples/)** - Before/after comparisons and reference implementations
 
 ---
