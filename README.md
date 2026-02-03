@@ -397,6 +397,153 @@ With PAS tools as self-documenting primitives:
 
 ---
 
+## MCP Integration: Remote Services, Not Local Wrappers
+
+PAS and MCP (Model Context Protocol) are **complementary**, not competing. The key distinction:
+
+- ❌ **Local MCP servers** = Unnecessary overhead (wrapping local tools)
+- ✅ **Remote MCP servers** = Valuable standardization (accessing external SaaS, APIs)
+- ✅ **PAS CLIs** = Bridge between agents and remote MCP
+
+### The Architecture
+
+```
+┌─────────────┐
+│   Agent     │
+└──────┬──────┘
+       │
+       ├─→ Local tools (git, npm, docker)    [PAS CLIs]
+       │
+       └─→ Remote services (GitHub API,       [Remote MCP]
+           Slack, Jira, external APIs)
+                    ↓
+           Accessed via PAS-compliant
+           CLI tools (murl, custom CLIs)
+```
+
+### Using `murl` for Remote MCP Access
+
+[`murl`](https://github.com/turlockmike/murl) is a PAS-compliant CLI that talks to remote MCP servers:
+
+```bash
+# List tools on a remote MCP server
+$ murl https://remote.mcpservers.org/fetch/mcp/tools
+
+# Call a remote tool with arguments
+$ murl https://remote.mcpservers.org/fetch/mcp/tools/fetch \
+  -d url=https://example.com
+
+# Agent-friendly: outputs pure JSON
+$ murl --help
+# Shows: curl-like interface for MCP servers
+```
+
+**The pattern:**
+- Agent runs: `murl <remote-mcp-url>/tools/my_tool -d arg=value`
+- `murl` handles MCP protocol translation
+- Agent receives structured JSON response
+- No local server needed
+
+### Custom PAS CLIs for External Services
+
+You can also write your own PAS-compliant wrappers:
+
+```bash
+#!/bin/bash
+# github-api - PAS CLI wrapping GitHub API
+
+if [ "$1" = "--agent" ]; then
+    # Machine mode: call GitHub API, return JSON
+    gh api "$2" --jq '.'
+else
+    # Human mode: pretty output
+    gh api "$2" | jq .
+fi
+```
+
+**Usage:**
+```bash
+# Agent uses it like any other PAS tool
+$ github-api --agent /repos/owner/repo/issues
+[{"id": 1, "title": "Bug report"}, ...]
+
+# Or use existing gh CLI directly
+$ gh issue list --json id,title
+```
+
+### Why This Replaces Local MCP Servers
+
+**Before (Local MCP Server):**
+```python
+# weather_mcp_server.py - 250 lines
+from mcp import Server
+
+@server.tool(name="get_weather")
+def get_weather(city: str):
+    response = requests.get(f"api.weather.com/{city}")
+    return response.json()
+
+# Must run continuously: python weather_mcp_server.py
+# Agent connects to: http://localhost:8080
+```
+
+**After (PAS CLI + Remote MCP):**
+```bash
+# Option 1: Direct PAS CLI (28 lines)
+$ weather --agent --city Boston
+{"temp": 45, "condition": "Cloudy"}
+
+# Option 2: Remote MCP via murl
+$ murl https://weather.mcpserver.com/mcp/tools/get_weather \
+  -d city=Boston
+{"temp": 45, "condition": "Cloudy"}
+```
+
+**Result:**
+- ✅ No local server to maintain
+- ✅ No port conflicts
+- ✅ No "is the server running?" debugging
+- ✅ Works with standard Unix pipes
+
+### When to Use What
+
+| Scenario | Solution |
+|----------|----------|
+| Local tool (git, docker, npm) | **PAS CLI** (just add `--agent` flag) |
+| External SaaS (GitHub, Slack) | **Existing CLI** (gh, slack-cli) with `--agent` |
+| Remote MCP server | **`murl`** (PAS-compliant MCP client) |
+| Custom integration | **Write PAS CLI** that calls external API |
+| Truly custom logic | **Remote MCP server** (not local) + murl |
+
+### Example: GitHub Integration
+
+**Bad (Local MCP Server):**
+```bash
+# Start local wrapper
+$ python github_mcp_server.py &  # Port 8080
+
+# Agent connects via MCP protocol
+agent.call_tool("create_issue", {"title": "Bug", "body": "..."})
+```
+
+**Good (PAS CLI):**
+```bash
+# Direct CLI usage
+$ gh issue create --agent --title "Bug" --body "..." --json url
+{"url": "https://github.com/owner/repo/issues/123"}
+
+# Or custom wrapper
+$ github-cli --agent create-issue --title "Bug" --body "..."
+```
+
+### Key Insight
+
+**Local MCP servers add complexity without benefit.** If you can write a local MCP server, you can write a simpler PAS CLI instead.
+
+**Remote MCP servers provide value:** They standardize access to external services you don't control. Access them via `murl` or custom PAS CLIs—not by running your own local MCP server.
+
+---
+
 ## Quick Start
 
 ### For Tool Builders
@@ -500,17 +647,28 @@ Tools are equally dangerous via MCP or CLI. The difference: CLI calls are audita
 
 ### Q: Does this replace MCP?
 
-**A:** No—it's complementary.
+**A:** It replaces **local** MCP servers, not remote ones.
+
+**The distinction:**
+- ❌ **Local MCP servers** = Unnecessary (use PAS CLIs instead)
+- ✅ **Remote MCP servers** = Valuable (for external SaaS, accessed via [`murl`](https://github.com/turlockmike/murl) or custom PAS CLIs)
 
 **Decision tree:**
 ```
-Does a CLI tool exist?
-├─ Yes → Use it directly (POSIX Agent Standard)
-└─ No → Could you build a CLI?
-    ├─ Yes → Build PAS-compliant CLI
-    └─ No → Is the logic truly custom?
-        └─ Yes → Consider MCP
+Building a tool for LOCAL operations (git, docker, files)?
+└─ Build a PAS-compliant CLI (NOT a local MCP server)
+
+Need to access REMOTE services (GitHub API, Slack)?
+├─ Does a CLI exist (gh, slack-cli)?
+│  └─ Yes → Use it with --agent flag
+└─ No CLI exists?
+   ├─ Remote MCP server available?
+   │  └─ Yes → Use murl to access it
+   └─ No remote MCP?
+      └─ Write custom PAS CLI that calls the API
 ```
+
+**Key insight:** If you're running an MCP server on localhost, you're adding complexity. Just write a PAS CLI instead.
 
 ### Q: What about complex workflows?
 
