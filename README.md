@@ -190,6 +190,8 @@ Total per tool: ~20 tokens
 
 That's **95% token savings** before you even start the task.
 
+**Note on token savings:** The 95% figure represents maximum theoretical savings from eliminating tool documentation overhead. Real-world deployments (like Vercel's) see 30-40% overall reduction because agents still need context for tasks, data, and reasoning—but tool docs no longer consume that valuable space.
+
 ---
 
 ## The Standard (TL;DR)

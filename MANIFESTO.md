@@ -493,9 +493,9 @@ Each tool is simple. The workflow is transparent.
    - Output JSON or JSON Lines
    - Return structured errors on stderr
 
-2. **Provide concise help** via `--help-agent`
+2. **Provide concise help** via `--agent --help`
    ```bash
-   $ mytool --help-agent
+   $ mytool --agent --help
    Usage: mytool [OPTIONS] <input>
 
    Common patterns:

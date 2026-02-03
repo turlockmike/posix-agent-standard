@@ -40,6 +40,25 @@ A tool may claim conformance at one of three levels:
 - Provides FUSE interface for data-heavy operations (where applicable)
 - Implements comprehensive error recovery guidance
 
+### 1.1 Choosing a Conformance Level
+
+**Level 1 (Minimum)** — Use when:
+- Quickly adding `--agent` support to existing tools
+- Prototyping or proof-of-concept tools
+- Simple wrappers around existing commands
+
+**Level 2 (Recommended)** — Use when:
+- Building new production-grade CLI tools
+- Tools that will be used frequently by agents
+- Examples: API clients, deployment tools, data processors
+
+**Level 3 (Ideal)** — Use when:
+- Building high-throughput data processing tools
+- Tools that handle large datasets or long-running operations
+- Examples: Database interfaces, filesystem mounts, streaming processors
+
+**Default recommendation:** New tools should target **Level 2**. Level 1 is acceptable for retrofitting existing tools; Level 3 is optional optimization.
+
 ---
 
 ## 2. Core Requirements
@@ -49,6 +68,8 @@ A tool may claim conformance at one of three levels:
 **Requirement:** All conforming tools MUST provide a flag (recommended: `--agent`) that acts as a **global mode switch**.
 
 **Core concept:** `--agent` is not just another flag—it modifies the behavior of ALL other flags and subcommands, transforming the tool into **Strict Machine Mode**.
+
+**Flag ordering:** Tools SHOULD accept `--agent` in any position, but conventionally it appears first (before subcommands and other flags). Tools MUST NOT require a specific position—`mytool --agent --city Boston` and `mytool --city Boston --agent` SHOULD behave identically.
 
 **Examples:**
 | Command | Behavior |
@@ -277,6 +298,29 @@ ANTI-PATTERNS:
 ```
 
 **Rationale:** Standard `--help` is optimized for human browsing (verbose, formatted). `--agent --help` is optimized for context window efficiency.
+
+**Implementation guidance (Bash example):**
+```bash
+# Parse flags to detect both --agent and --help
+AGENT_MODE=false
+SHOW_HELP=false
+
+for arg in "$@"; do
+    [ "$arg" = "--agent" ] && AGENT_MODE=true
+    [ "$arg" = "--help" ] || [ "$arg" = "-h" ] && SHOW_HELP=true
+done
+
+if [ "$SHOW_HELP" = true ]; then
+    if [ "$AGENT_MODE" = true ]; then
+        show_agent_help  # Concise contract
+    else
+        show_human_help  # Verbose tutorial
+    fi
+    exit 0
+fi
+```
+
+**Exit code:** Help output (both human and agent) MUST exit with code 0 (success).
 
 ### 4.2 LLM Documentation Files (Optional, Level 3)
 
