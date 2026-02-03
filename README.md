@@ -391,7 +391,7 @@ With PAS tools as self-documenting primitives:
 
 **Result:** Zero duplication. eslint documents itself once via `--help-agent`.
 
-**[📖 Read the complete Skills Integration guide →](./SKILLS-INTEGRATION.md)**
+**[📖 Read the complete Skills guide →](./SKILLS.md)**
 
 ---
 
@@ -468,7 +468,7 @@ print(f"Token reduction: {(baseline - posix) / baseline * 100}%")
 
 📐 **[Read the Specification](./SPECIFICATION.md)** - Technical requirements for implementers (30 min read)
 
-🔗 **[Skills Integration Guide](./SKILLS-INTEGRATION.md)** - How PAS works with Agent Skills frameworks (20 min read)
+🔗 **[Skills Guide](./SKILLS.md)** - How PAS works with Agent Skills frameworks (20 min read)
 
 🎯 **[See Examples](./examples/)** - Before/after comparisons and reference implementations
 

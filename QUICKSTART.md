@@ -408,7 +408,7 @@ print(f"Speed improvement: {baseline_time / pas_time}x")
 
 - **Why?** [Read the Manifesto](./MANIFESTO.md) (15 min)
 - **How?** [Read the Specification](./SPECIFICATION.md) (30 min)
-- **Integration** [PAS + Agent Skills](./SKILLS-INTEGRATION.md) (20 min)
+- **Integration** [PAS + Agent Skills](./SKILLS.md) (20 min)
 - **Show me!** [See Examples](./examples/README.md) (20 min)
 - **I want to help** [Contributing Guide](./CONTRIBUTING.md) (5 min)
 
