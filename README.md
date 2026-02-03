@@ -280,6 +280,121 @@ Each tool:
 
 ---
 
+## Integration with Agent Skills
+
+PAS tools and Agent Skills (like Claude Code, agentskills.io) are **complementary** and work best together.
+
+### The Pattern: Separation of Concerns
+
+**PAS CLI Tools** answer:
+- ✅ **WHAT** can this tool do?
+- ✅ **HOW** do I use it?
+
+**Agent Skills** answer:
+- ✅ **WHEN** should I use this tool?
+- ✅ **WHY** should I use it this way?
+- ✅ **Opinionated workflows** and SOPs
+
+### Example: Code Review
+
+**❌ Bad: Bloated Skill (Duplication)**
+```markdown
+# Code Review Skill (900 lines)
+
+## Tools
+- eslint: Lints JavaScript
+  - Usage: eslint [options] file.js
+  - Options: --fix, --format json, --quiet
+  - Exit codes: 0 (no issues), 1 (issues found)
+
+- pytest: Runs Python tests
+  - Usage: pytest [options] [path]
+  - Options: -v, --json-report, -x
+  - Exit codes: 0 (passed), 1 (failed)
+
+## Workflow
+1. Run eslint on changed files...
+```
+
+**✅ Good: Clean Skill (Workflow Only)**
+```markdown
+# Code Review Skill (50 lines)
+
+## When to Use
+Use when reviewing PRs or validating code changes.
+
+## Workflow
+
+1. Lint JavaScript/TypeScript files:
+   ```bash
+   git diff --name-only | grep '\.js$' | xargs eslint --agent
+   ```
+
+2. Run tests:
+   ```bash
+   pytest --agent tests/
+   ```
+
+**Policy:** Code fails review if ANY test fails.
+**Opinion:** New TODOs are discouraged—create tickets instead.
+```
+
+### Why This Works
+
+| Concern | Handled By | Benefit |
+|---------|-----------|---------|
+| Tool syntax & flags | CLI (`--help-agent`) | Single source of truth |
+| Common usage patterns | CLI (`--help-agent`) | Tools self-document |
+| Company policies | Skill | Encodes business logic |
+| Workflow orchestration | Skill | Focus on procedure |
+| Error handling | Both | CLI defines codes, Skill handles them |
+
+### Token Economics
+
+**Without separation:**
+- Skill with embedded tool docs: ~900 lines
+- Agent loads all upfront: ~2000 tokens
+
+**With separation:**
+- Skill (workflow only): ~50 lines
+- Tools consulted just-in-time when needed
+- Total initial load: ~120 tokens
+- **Savings: 94%**
+
+### Progressive Disclosure
+
+```
+Agent receives task: "Review this PR"
+    ↓
+Loads skill (50 lines, ~120 tokens)
+    ↓
+Skill says: "Run eslint --agent on changed files"
+    ↓
+Agent needs details → Runs: eslint --help-agent
+    ↓
+Gets concise docs (20 lines, ~50 tokens)
+    ↓
+Executes command
+    ↓
+Continues workflow
+```
+
+**Key insight:** Tools loaded **only when needed**, not upfront.
+
+### Reusability
+
+With PAS tools as self-documenting primitives:
+
+- **"Code Review" skill** → Uses `eslint --agent`
+- **"Pre-commit Check" skill** → Uses `eslint --agent`
+- **"CI Pipeline" skill** → Uses `eslint --agent`
+
+**Result:** Zero duplication. eslint documents itself once via `--help-agent`.
+
+**[📖 Read the complete Skills Integration guide →](./SKILLS-INTEGRATION.md)**
+
+---
+
 ## Quick Start
 
 ### For Tool Builders
