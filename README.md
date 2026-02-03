@@ -645,6 +645,50 @@ Tools are equally dangerous via MCP or CLI. The difference: CLI calls are audita
 - JSON Lines works everywhere
 - `--agent` is cross-platform
 
+### Q: Is this actually part of the official POSIX standard?
+
+**A:** No. PAS builds on POSIX, it doesn't replace it.
+
+**The historical context:**
+
+The original POSIX standard (IEEE 1003.1-1988) standardized the **interface**—pipes, flags, exit codes—but deliberately left the **data format** as unstructured text. This was intentional: POSIX was designed for human operators using interactive shells.
+
+POSIX's only attempt at standardizing output was `LC_ALL=C` (the language locale), which ensured consistent language but not structured data. This was sufficient for humans reading terminal output, but insufficient for machine operators (agents) that need to parse results programmatically.
+
+**Historical precedents:**
+
+PAS isn't a novel idea—it's a formalization of concepts that have existed for decades:
+
+- **FreeBSD's libxo (2014)**: Allowed tools to output XML/JSON via a flag, enabling structured logging while maintaining human-readable defaults. PAS adopts this "flag-switches-mode" pattern with `--agent`.
+
+- **Plan 9's 9P protocol (1992)**: Treated everything—including network resources—as files with a standard interface. PAS Level 3-4 echo this philosophy: `ls`, `cat`, `stat` for remote resources.
+
+**What PAS actually does:**
+
+PAS completes POSIX by standardizing the **missing piece**: structured data interchange for machine operators.
+
+| What POSIX Gave Us | What PAS Adds |
+|-------------------|---------------|
+| Pipes (`\|`) | Data format (JSON Lines) |
+| Exit codes (0, 1, 2) | Semantic codes (100-125) |
+| Flags (`--help`) | Agent mode (`--agent --help`) |
+| Text streams | Structured streams |
+
+**The relationship:**
+
+```
+POSIX (1988)          PAS (2025)
+    ↓                     ↓
+Interface         +   Data Format
+(How to call)         (What you get)
+    ↓                     ↓
+        Combined = Agent-Native Unix
+```
+
+PAS doesn't replace POSIX—it respects every POSIX convention (pipes, exit codes, flags). It simply adds the standardization layer that enables machines to reliably parse what tools output.
+
+**In other words:** POSIX told tools *how* to talk. PAS tells them *what language* to use when talking to machines.
+
 ### Q: Does this replace MCP?
 
 **A:** It replaces **local** MCP servers, not remote ones.

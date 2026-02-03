@@ -941,6 +941,44 @@ Does a CLI tool already exist for this? → Use it directly (PAS)
 
 Windows-specific consideration: Use `CRLF` line endings or handle both `LF` and `CRLF`.
 
+### Q: Is this part of the official POSIX standard?
+
+**A:** No. PAS is not part of IEEE 1003.1 (POSIX). It builds on POSIX conventions but adds what POSIX deliberately left unspecified: structured data format.
+
+**Historical context:**
+
+POSIX (1988) standardized:
+- ✅ Interface: pipes, flags, exit codes, file descriptors
+- ❌ Data format: deliberately left as unstructured text
+
+This made sense for human operators, but creates problems for machine operators (agents) that need to parse output programmatically.
+
+**What PAS standardizes:**
+
+PAS completes the picture by specifying:
+- Data format: JSON Lines for structured output
+- Mode switching: `--agent` flag for deterministic behavior
+- Help documentation: `--agent --help` for machine-readable contracts
+- Semantic exit codes: 100-125 range for application-specific errors
+
+**Precedents:**
+
+PAS formalizes ideas that have existed in Unix-like systems:
+- **FreeBSD's libxo (2014)**: Library enabling tools to output XML/JSON via flags
+- **Plan 9's 9P (1992)**: Protocol treating remote resources as files with standard operations
+
+**Relationship to POSIX:**
+
+```
+POSIX provides:        PAS adds:
+- Pipes (|)           - Data format (JSON Lines)
+- Exit codes          - Semantic codes (100+)
+- Flags               - Agent mode (--agent)
+- Text streams        - Structured streams
+```
+
+PAS respects all POSIX conventions and adds the standardization layer that POSIX intentionally omitted.
+
 ### Q: Doesn't this give agents too much power?
 
 **A:** Safety is achieved through sandboxing, not through limiting interfaces.
