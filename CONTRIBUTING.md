@@ -19,7 +19,7 @@ Found something unclear, inconsistent, or broken?
 - Provide concrete examples when possible
 - Explain the impact (blocks implementation, causes confusion, etc.)
 
-[Open an Issue →](https://github.com/posix-agent-standard/spec/issues/new)
+[Open an Issue →](https://github.com/turlockmike/posix-agent-standard/issues/new)
 
 ---
 
@@ -46,7 +46,7 @@ Have an idea for improving the standard?
 >
 > **Compatibility:** Purely additive; no breaking changes.
 
-[Start a Discussion →](https://github.com/posix-agent-standard/spec/discussions)
+[Start a Discussion →](https://github.com/turlockmike/posix-agent-standard/discussions)
 
 ---
 
@@ -454,7 +454,7 @@ Authors are credited in their case study files and linked from README.
 
 ## Questions?
 
-- **Specification questions:** [Open a discussion](https://github.com/posix-agent-standard/spec/discussions)
+- **Specification questions:** [Open a discussion](https://github.com/turlockmike/posix-agent-standard/discussions)
 - **Implementation help:** [Join our Discord](https://discord.gg/posix-agents) *(placeholder)*
 - **Email:** hello@posix-agents.org *(placeholder)*
 
@@ -474,5 +474,5 @@ Every contribution—whether it's fixing a typo, adding an example, or proposing
 - [Specification](./SPECIFICATION.md)
 - [Manifesto](./MANIFESTO.md)
 - [Examples](./examples/)
-- [Issue Tracker](https://github.com/posix-agent-standard/spec/issues)
-- [Discussions](https://github.com/posix-agent-standard/spec/discussions)
+- [Issue Tracker](https://github.com/turlockmike/posix-agent-standard/issues)
+- [Discussions](https://github.com/turlockmike/posix-agent-standard/discussions)

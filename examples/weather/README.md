@@ -464,4 +464,4 @@ echo -e "Boston\nLondon\nTokyo" \
 
 ---
 
-**Questions?** [Open an issue](https://github.com/posix-agent-standard/spec/issues) or try both approaches yourself!
+**Questions?** [Open an issue](https://github.com/turlockmike/posix-agent-standard/issues) or try both approaches yourself!

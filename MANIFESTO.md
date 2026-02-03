@@ -538,11 +538,11 @@ We propose formalizing these principles into a lightweight standard.
 #### Repository
 We maintain a reference implementation and growing library of examples:
 
-**[github.com/posix-agent-standard/spec](https://github.com/posix-agent-standard/spec)** *(placeholder URL)*
+**[github.com/turlockmike/posix-agent-standard](https://github.com/turlockmike/posix-agent-standard)**
 
 ```bash
 # Clone and explore
-git clone https://github.com/posix-agent-standard/spec
+git clone https://github.com/turlockmike/posix-agent-standard
 cd spec/examples
 ./weather-agent.sh  # See a real comparison
 ```
@@ -572,7 +572,7 @@ The agents are already fluent in Unix. We just need to stop translating for them
 
 ## References
 
-<a name="ref1"></a>**[1]** Qu, Andrew. "We Removed 80% of Our Agent's Tools (And It Got Better)." *Vercel Blog*, December 2024. [vercel.com/blog/ai-agent-optimization](https://vercel.com/blog/ai-agent-optimization) *(Note: Placeholder URL—actual case study referenced in industry discussions)*
+<a name="ref1"></a>**[1]** Qu, Andrew. "We removed 80% of our agent's tools." *Vercel Blog*, January 2025. [vercel.com/blog/we-removed-80-percent-of-our-agents-tools](https://vercel.com/blog/we-removed-80-percent-of-our-agents-tools)
 
 <a name="ref2"></a>**[2]** McIlroy, M. D., Pinson, E. N., & Tague, B. A. "Unix Time-Sharing System: Foreword." *The Bell System Technical Journal*, 1978. [Archive](https://archive.org/details/bstj57-6-1899)
 

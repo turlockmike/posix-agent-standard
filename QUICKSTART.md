@@ -449,7 +449,7 @@ A: PAS works on Windows with PowerShell. The principles (JSON output, structured
 3. **Share results:** Tell us your token savings and speedup
 4. **Contribute:** Add your tool to the examples directory
 
-**Questions?** [Open an issue](https://github.com/posix-agent-standard/spec/issues)
+**Questions?** [Open an issue](https://github.com/turlockmike/posix-agent-standard/issues)
 
 ---
 

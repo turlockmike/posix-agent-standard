@@ -764,10 +764,10 @@ $ word-counter --agent nonexistent.txt
 
 ## Appendix B: Resources
 
-- **Reference implementation:** [github.com/posix-agent-standard/reference](https://github.com/posix-agent-standard/reference)
-- **Test suite:** [github.com/posix-agent-standard/tests](https://github.com/posix-agent-standard/tests)
-- **Community examples:** [github.com/posix-agent-standard/examples](https://github.com/posix-agent-standard/examples)
-- **Discussion forum:** [github.com/posix-agent-standard/discussions](https://github.com/posix-agent-standard/discussions)
+- **Main repository:** [github.com/turlockmike/posix-agent-standard](https://github.com/turlockmike/posix-agent-standard)
+- **Examples:** [github.com/turlockmike/posix-agent-standard/tree/master/examples](https://github.com/turlockmike/posix-agent-standard/tree/master/examples)
+- **Discussion forum:** [github.com/turlockmike/posix-agent-standard/discussions](https://github.com/turlockmike/posix-agent-standard/discussions)
+- **Issue tracker:** [github.com/turlockmike/posix-agent-standard/issues](https://github.com/turlockmike/posix-agent-standard/issues)
 
 ---
 

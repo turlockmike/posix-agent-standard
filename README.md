@@ -5,7 +5,7 @@
 A lightweight standard for building AI agent-compatible CLI tools based on Unix principles—because the best interface is the one your agent already knows.
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
-[![Status: RFC](https://img.shields.io/badge/Status-RFC-yellow.svg)](https://github.com/posix-agent-standard/spec)
+[![Status: RFC](https://img.shields.io/badge/Status-RFC-yellow.svg)](https://github.com/turlockmike/posix-agent-standard)
 [![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0--draft-blue.svg)](./SPECIFICATION.md)
 
 ---
@@ -530,7 +530,7 @@ Each step is simple. The workflow is transparent.
 
 ### ⭐ Star This Repo
 
-Show support for the standard by starring [github.com/posix-agent-standard/spec](https://github.com/posix-agent-standard/spec)
+Show support for the standard by starring [github.com/turlockmike/posix-agent-standard](https://github.com/turlockmike/posix-agent-standard)
 
 ### 🛠️ Adopt It
 
@@ -596,8 +596,8 @@ Inspired by:
 
 ## Contact
 
-- **Specification Issues:** [GitHub Issues](https://github.com/posix-agent-standard/spec/issues)
-- **General Discussion:** [GitHub Discussions](https://github.com/posix-agent-standard/spec/discussions)
+- **Specification Issues:** [GitHub Issues](https://github.com/turlockmike/posix-agent-standard/issues)
+- **General Discussion:** [GitHub Discussions](https://github.com/turlockmike/posix-agent-standard/discussions)
 - **Email:** hello@posix-agents.org *(placeholder)*
 
 ---

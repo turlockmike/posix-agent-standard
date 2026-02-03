@@ -254,4 +254,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md#share-case-studies) for guidelines.
 
 ---
 
-**Questions about these examples?** [Open an issue](https://github.com/posix-agent-standard/spec/issues) or [start a discussion](https://github.com/posix-agent-standard/spec/discussions).
+**Questions about these examples?** [Open an issue](https://github.com/turlockmike/posix-agent-standard/issues) or [start a discussion](https://github.com/turlockmike/posix-agent-standard/discussions).

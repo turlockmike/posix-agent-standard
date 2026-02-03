@@ -414,9 +414,9 @@ Consider creating these graphics for sharing:
 ## Repository URLs to Share
 
 Once published, share:
-- Main repo: `github.com/posix-agent-standard/spec`
-- Examples: `github.com/posix-agent-standard/spec/tree/main/examples`
-- Weather comparison: `github.com/posix-agent-standard/spec/tree/main/examples/weather`
+- Main repo: `github.com/turlockmike/posix-agent-standard`
+- Examples: `github.com/turlockmike/posix-agent-standard/tree/main/examples`
+- Weather comparison: `github.com/turlockmike/posix-agent-standard/tree/main/examples/weather`
 
 ---
 
