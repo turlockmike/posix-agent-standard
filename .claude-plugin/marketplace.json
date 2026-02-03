@@ -1,0 +1,20 @@
+{
+  "name": "pas-builder",
+  "description": "POSIX Agent Standard (PAS) - Build CLI tools that work seamlessly with AI agents",
+  "owner": {
+    "name": "POSIX Agent Standard Contributors",
+    "email": "noreply@github.com"
+  },
+  "plugins": [
+    {
+      "name": "pas-builder",
+      "description": "Build PAS-compliant CLI tools that work seamlessly with AI agents. Includes comprehensive guides, templates, and examples for implementing the POSIX Agent Standard.",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "POSIX Agent Standard Contributors",
+        "email": "noreply@github.com"
+      }
+    }
+  ]
+}

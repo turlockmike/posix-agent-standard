@@ -1,5 +1,6 @@
-# Claude Code
-.claude/
+# Claude Code (except skills - those should be in the repo)
+.claude/*
+!.claude/skills/
 
 # OS files
 .DS_Store

@@ -546,6 +546,36 @@ $ github-cli --agent create-issue --title "Bug" --body "..."
 
 ## Quick Start with PAS
 
+### For Claude Code Users
+
+**Install the PAS Builder Skill** to get guided assistance when building PAS-compliant tools:
+
+```bash
+# Method 1: Install via plugin (recommended)
+claude plugin marketplace add turlockmike/posix-agent-standard
+claude plugin install pas-builder@posix-agent-standard
+
+# Method 2: Install via git clone
+git clone https://github.com/turlockmike/posix-agent-standard.git
+cp -r posix-agent-standard/.claude/skills/pas-builder ~/.claude/skills/
+```
+
+**What you get:**
+- Automatic guidance when building CLI tools for agents
+- Step-by-step implementation checklists
+- Template scripts (Bash and Python) ready to copy
+- Complete examples and anti-patterns
+- Technical specification reference
+
+**Usage:**
+- The skill triggers automatically when you ask Claude to build agent-compatible CLIs
+- Or invoke manually: `/pas-builder`
+- Especially useful when creating scripts for Claude Code skills
+
+**Why install it?** The skill teaches Claude (and you!) the patterns in this standard, making it faster to build compliant tools and helping avoid common mistakes.
+
+---
+
 ### For Tool Builders
 
 **Add agent mode to your existing CLI in 5 minutes:**
