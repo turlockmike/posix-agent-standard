@@ -1,8 +1,8 @@
-# The POSIX Agent Standard
+# The POSIX Agent Standard (PAS)
 
 > **"Don't teach your AI to use an API. Teach it to use a Computer."**
 
-A lightweight standard for building AI agent-compatible CLI tools based on Unix principles—because the best interface is the one your agent already knows.
+**PAS** is a lightweight standard for building AI agent-compatible CLI tools based on Unix principles—because the best interface is the one your agent already knows.
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Status: RFC](https://img.shields.io/badge/Status-RFC-yellow.svg)](https://github.com/turlockmike/posix-agent-standard)
@@ -19,7 +19,7 @@ A lightweight standard for building AI agent-compatible CLI tools based on Unix 
 - ✅ **37% fewer** tokens
 - ✅ **95-100%** success rate (up from 80%)
 
-**The Solution:** Stop building wrappers. Make your CLIs agent-friendly by following simple Unix conventions.
+**The Solution (PAS):** Stop building wrappers. Make your CLIs agent-friendly by following simple Unix conventions.
 
 ---
 
@@ -194,9 +194,9 @@ That's **95% token savings** before you even start the task.
 
 ---
 
-## The Standard (TL;DR)
+## The PAS Standard (TL;DR)
 
-Make your CLI "agent-friendly" by following 3 simple rules:
+Make your CLI "agent-friendly" by following 3 simple PAS rules:
 
 ### 1. Add an `--agent` flag
 
@@ -544,7 +544,7 @@ $ github-cli --agent create-issue --title "Bug" --body "..."
 
 ---
 
-## Quick Start
+## Quick Start with PAS
 
 ### For Tool Builders
 
@@ -730,11 +730,11 @@ Each step is simple. The workflow is transparent.
 
 ---
 
-## Get Involved
+## Get Involved with PAS
 
 ### ⭐ Star This Repo
 
-Show support for the standard by starring [github.com/turlockmike/posix-agent-standard](https://github.com/turlockmike/posix-agent-standard)
+Show support for PAS by starring [github.com/turlockmike/posix-agent-standard](https://github.com/turlockmike/posix-agent-standard)
 
 ### 🛠️ Adopt It
 
