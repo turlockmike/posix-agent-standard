@@ -34,11 +34,20 @@ A tool may claim conformance at one of three levels:
 - Provides `--agent --help` or `.llm` documentation
 - Uses semantic exit codes
 
-### Level 3: Agent-Native (Ideal)
+### Level 3: The Navigation Contract (Optional)
 - Level 2 requirements, plus:
-- Supports streaming output
-- Provides FUSE interface for data-heavy operations (where applicable)
-- Implements comprehensive error recovery guidance
+- Implements Unix-style navigation verbs for remote resources
+- Standard verbs: `ls` (list), `cat` (read), `stat` (metadata)
+- Hierarchical path structure (e.g., `/users/123/orders`)
+- For tools managing external datasets (APIs, databases, cloud storage)
+
+### Level 4: The State Contract (Advanced)
+- Level 3 requirements, plus:
+- Implements manipulation verbs: `cp` (write), `rm` (delete)
+- Supports `sync` command for one-way synchronization
+- Optional: `mount` command for FUSE virtualization
+- Implements `feedback` command for reporting tool issues
+- For tools handling synchronization, mounting, or writing
 
 ### 1.1 Choosing a Conformance Level
 
@@ -51,13 +60,21 @@ A tool may claim conformance at one of three levels:
 - Building new production-grade CLI tools
 - Tools that will be used frequently by agents
 - Examples: API clients, deployment tools, data processors
+- **Default target for new tools**
 
-**Level 3 (Ideal)** — Use when:
-- Building high-throughput data processing tools
-- Tools that handle large datasets or long-running operations
-- Examples: Database interfaces, filesystem mounts, streaming processors
+**Level 3 (Navigation Contract)** — Use when:
+- Building read-only interfaces to external data sources
+- Exposing remote APIs, databases, or cloud storage
+- Need hierarchical navigation of remote resources
+- Examples: GitHub repo browser, S3 bucket explorer, database query tool
 
-**Default recommendation:** New tools should target **Level 2**. Level 1 is acceptable for retrofitting existing tools; Level 3 is optional optimization.
+**Level 4 (State Contract)** — Use when:
+- Building full read/write interfaces to external systems
+- Need synchronization between local and remote state
+- Want to provide filesystem-like access via FUSE
+- Examples: Cloud storage sync tools, database managers, API orchestration tools
+
+**Default recommendation:** New tools should target **Level 2**. Level 3 for read-heavy data tools. Level 4 for full-featured data management tools.
 
 ---
 
@@ -337,56 +354,336 @@ Tools MAY provide a `.llm` file at `docs/<tool>.llm` or `/usr/share/doc/<tool>/a
 
 ---
 
-## 5. Advanced Features (Level 3)
+## 5. Level 3: The Navigation Contract (Optional)
 
-### 5.1 Streaming Output
+Level 3 tools expose external datasets (APIs, databases, cloud storage) using Unix-style navigation commands.
 
-For long-running operations, tools SHOULD emit progress events as JSON Lines:
+### 5.1 Core Principle: Hierarchical Paths
 
+Resources are accessed via hierarchical path strings, similar to filesystems:
+```
+/users/123          # User with ID 123
+/repos/owner/name   # GitHub repository
+/buckets/my-bucket/files/data.json  # S3 object
+```
+
+### 5.2 Standard Navigation Verbs
+
+Level 3 tools MUST implement these standard verbs:
+
+#### `ls` - List Children
+
+**Signature:**
 ```bash
-$ large-task --agent
-{"event":"start","timestamp":"2026-02-03T10:00:00Z"}
-{"event":"progress","step":1,"total":10,"message":"Validating input"}
-{"event":"progress","step":2,"total":10,"message":"Connecting to API"}
-...
-{"event":"complete","result":{"id":12345,"status":"success"}}
+tool ls <path> --agent
+```
+
+**Output (JSON Lines):**
+```bash
+$ gh-cli ls /repos/owner/repo/issues --agent
+{"path":"/repos/owner/repo/issues/1","type":"file","id":"1","name":"Bug report"}
+{"path":"/repos/owner/repo/issues/2","type":"file","id":"2","name":"Feature request"}
+```
+
+**Schema:**
+```json
+{
+  "path": "/full/path/to/resource",
+  "type": "file|dir",
+  "id": "resource_identifier",
+  "name": "human_readable_name"
+}
 ```
 
 **Requirements:**
-- Each event is a complete JSON object
-- Flush stdout after each line (no buffering)
-- Final line indicates completion or error
+- Output MUST be JSON Lines (one object per line)
+- Each object MUST include `path` and `type`
+- `type` MUST be either `"file"` or `"dir"`
+- Optional fields: `id`, `name`, `size`, `modified`
 
-### 5.2 FUSE Interfaces
+#### `cat` - Read Content
 
-For data-heavy tools (databases, APIs, cloud storage), tools SHOULD provide a FUSE mount option:
-
+**Signature:**
 ```bash
-$ db-fuse mount --agent ./db-mount
-# stderr: {"event":"mounted","path":"./db-mount"}
-
-$ ls ./db-mount/tables
-users.json
-products.json
-orders.json
-
-$ cat ./db-mount/tables/users.json | head -n 1
-{"id":1,"name":"Alice","email":"alice@example.com"}
-
-$ echo '{"name":"Bob","email":"bob@example.com"}' > ./db-mount/tables/users.json
-# Automatically translates to: INSERT INTO users ...
+tool cat <path> --agent
 ```
 
-**Rationale:**
-- Agents learn ONE interface (file I/O) for ALL data sources
-- Standard tools (`cat`, `grep`, `jq`) work immediately
-- No custom API learning required
+**Output (JSON):**
+```bash
+$ gh-cli cat /repos/owner/repo/issues/1 --agent
+{"id":1,"title":"Bug report","body":"Description here","state":"open","author":"user123"}
+```
+
+**Requirements:**
+- Output MUST be valid JSON
+- Output represents the complete resource content
+- For large resources, MAY output JSON Lines of chunks
+
+#### `stat` - Read Metadata
+
+**Signature:**
+```bash
+tool stat <path> --agent
+```
+
+**Output (JSON):**
+```bash
+$ s3-cli stat /buckets/my-bucket/file.json --agent
+{
+  "path": "/buckets/my-bucket/file.json",
+  "size": 1024,
+  "modified": "2024-01-01T00:00:00Z",
+  "type": "file",
+  "permissions": "read-only",
+  "etag": "abc123"
+}
+```
+
+**Required fields:**
+- `path`: Full path to resource
+- `type`: "file" or "dir"
+- `size`: Size in bytes (for files)
+
+**Optional fields:**
+- `modified`: ISO 8601 timestamp
+- `permissions`: Access level description
+- `etag`, `checksum`: Content versioning
+
+### 5.3 Path Conventions
+
+**Directory paths:**
+- MAY end with trailing slash: `/users/` or `/users`
+- Tools MUST accept both forms
+
+**Root path:**
+- Empty string `""` or `/` refers to root
+- `tool ls / --agent` lists top-level resources
+
+**Path separators:**
+- MUST use forward slash `/`
+- MUST NOT use backslash `\` (even on Windows)
+
+### 5.4 Example: GitHub CLI (Level 3)
+
+```bash
+# List repositories
+$ gh-cli ls /repos/turlockmike --agent
+{"path":"/repos/turlockmike/murl","type":"dir","name":"murl"}
+{"path":"/repos/turlockmike/posix-agent-standard","type":"dir","name":"posix-agent-standard"}
+
+# List issues in a repo
+$ gh-cli ls /repos/turlockmike/murl/issues --agent
+{"path":"/repos/turlockmike/murl/issues/1","type":"file","id":"1"}
+{"path":"/repos/turlockmike/murl/issues/2","type":"file","id":"2"}
+
+# Read an issue
+$ gh-cli cat /repos/turlockmike/murl/issues/1 --agent
+{"id":1,"title":"Add feature","body":"...","state":"open"}
+
+# Get issue metadata
+$ gh-cli stat /repos/turlockmike/murl/issues/1 --agent
+{"path":"/repos/turlockmike/murl/issues/1","type":"file","modified":"2024-01-01T00:00:00Z"}
+```
 
 ---
 
-## 6. Error Handling
+## 6. Level 4: The State Contract (Advanced)
 
-### 6.1 Structured Errors
+Level 4 extends Level 3 with write operations, synchronization, and optional filesystem mounting.
+
+### 6.1 Manipulation Verbs
+
+#### `cp` - Write/Upload
+
+**Signature:**
+```bash
+tool cp <source> <dest> --agent
+```
+
+**Examples:**
+```bash
+# Upload local file to remote
+$ s3-cli cp ./local.txt /buckets/my-bucket/remote.txt --agent
+{"status":"success","path":"/buckets/my-bucket/remote.txt","bytes":1024}
+
+# Copy between remote paths
+$ s3-cli cp /buckets/src/file.txt /buckets/dest/file.txt --agent
+{"status":"success","path":"/buckets/dest/file.txt"}
+```
+
+**Output (JSON):**
+```json
+{
+  "status": "success|error",
+  "path": "/destination/path",
+  "bytes": 1024,
+  "message": "Optional error message"
+}
+```
+
+#### `rm` - Delete
+
+**Signature:**
+```bash
+tool rm <path> --agent
+```
+
+**Output (JSON):**
+```bash
+$ s3-cli rm /buckets/my-bucket/old-file.txt --agent
+{"status":"success","path":"/buckets/my-bucket/old-file.txt","deleted":true}
+```
+
+**Requirements:**
+- MUST require explicit path (no wildcards unless `--force` flag)
+- MUST output structured confirmation
+- Exit code 0 on success, non-zero on failure
+
+### 6.2 Synchronization: `sync`
+
+**Purpose:** One-way pull from remote to local disk
+
+**Signature:**
+```bash
+tool sync <remote_path> <local_dir> --agent
+```
+
+**Behavior:**
+1. List remote resources via internal `ls`
+2. Compare with local filesystem
+3. Download only changed/new files
+4. Output progress as JSON Lines
+
+**Output (JSON Lines):**
+```bash
+$ s3-cli sync /buckets/my-bucket ./local-copy --agent
+{"event":"start","remote":"/buckets/my-bucket","local":"./local-copy"}
+{"event":"scanning","total":150}
+{"event":"downloading","file":"data.json","progress":0.5}
+{"event":"complete","downloaded":45,"skipped":105,"errors":0}
+```
+
+**Event types:**
+- `start`: Sync begins
+- `scanning`: Counting remote files
+- `downloading`: File transfer in progress
+- `complete`: Final summary
+
+### 6.3 Virtualization: `mount` (Optional)
+
+**Purpose:** Expose remote resources as local filesystem via FUSE
+
+**Signature:**
+```bash
+tool mount <remote_path> <local_mountpoint> --agent
+```
+
+**Example:**
+```bash
+$ s3-cli mount /buckets/my-bucket ./s3-mount --agent
+{"status":"mounted","path":"./s3-mount","remote":"/buckets/my-bucket"}
+
+# Now standard Unix commands work:
+$ ls ./s3-mount
+file1.txt  file2.json  subdir/
+
+$ cat ./s3-mount/file1.txt
+Remote content appears as local file
+
+$ cp ./new-file.txt ./s3-mount/
+# Automatically uploads to S3
+```
+
+**Requirements:**
+- MUST use FUSE or equivalent
+- Read operations SHOULD be lazy (fetch on access)
+- Write operations SHOULD be immediate or buffered with `sync` command
+- MUST handle unmount gracefully
+
+**Unmount:**
+```bash
+$ s3-cli unmount ./s3-mount --agent
+{"status":"unmounted","path":"./s3-mount"}
+```
+
+### 6.4 Feedback: `feedback`
+
+**Purpose:** Allow agents to report tool issues back to maintainers
+
+**Signature:**
+```bash
+tool feedback <resource_path> --level <info|warn|error> --message "<text>" [--email <author_email>] --agent
+```
+
+**Example:**
+```bash
+$ api-cli feedback /users/123 --level error \
+  --message "Resource returned malformed JSON" \
+  --email agent@example.com --agent
+{"status":"sent","issue_id":"12345","tracked_at":"https://github.com/owner/tool/issues/12345"}
+```
+
+**Parameters:**
+- `resource_path`: Path that caused the issue
+- `--level`: Severity (`info`, `warn`, `error`)
+- `--message`: Description of the problem
+- `--email`: (Optional) Contact email for follow-up
+- `--context`: (Optional) Additional debug info
+
+**Output (JSON):**
+```json
+{
+  "status": "sent",
+  "issue_id": "tracking_reference",
+  "tracked_at": "URL where feedback was recorded"
+}
+```
+
+**Use cases:**
+- Report malformed API responses
+- Signal deprecated endpoints
+- Request missing features
+- Report performance issues
+
+**Implementation:**
+Tools MAY implement `feedback` by:
+- Creating GitHub issues automatically
+- Logging to a feedback database
+- Sending to a monitoring service
+- Emailing maintainers
+
+### 6.5 Example: Full S3 CLI (Level 4)
+
+```bash
+# Navigation (Level 3)
+$ s3-cli ls /buckets/my-bucket --agent
+{"path":"/buckets/my-bucket/file1.txt","type":"file"}
+
+# Writing (Level 4)
+$ s3-cli cp ./local.txt /buckets/my-bucket/upload.txt --agent
+{"status":"success","bytes":2048}
+
+# Synchronization (Level 4)
+$ s3-cli sync /buckets/my-bucket ./backup --agent
+{"event":"start"}
+{"event":"downloading","file":"file1.txt","progress":1.0}
+{"event":"complete","downloaded":50}
+
+# Mounting (Level 4, optional)
+$ s3-cli mount /buckets/my-bucket ./s3 --agent
+{"status":"mounted","path":"./s3"}
+
+# Feedback (Level 4)
+$ s3-cli feedback /buckets/my-bucket/broken.json --level error \
+  --message "File returns 500 error" --agent
+{"status":"sent","issue_id":"456"}
+```
+
+---
+
+## 7. Error Handling
+
+### 7.1 Structured Errors
 
 **Requirement (Level 1):** All errors MUST be emitted as JSON to stderr.
 
@@ -435,9 +732,9 @@ $ api-client get --agent /users/999999
 
 ---
 
-## 7. Security Considerations
+## 8. Security Considerations
 
-### 7.1 Sandboxing Compatibility
+### 8.1 Sandboxing Compatibility
 
 Tools SHOULD be designed to work in restricted environments:
 
@@ -448,7 +745,7 @@ Tools SHOULD be designed to work in restricted environments:
 # - Limited PATH (no shell-out to unknown binaries)
 ```
 
-### 7.2 Credential Handling
+### 8.2 Credential Handling
 
 **Requirement (Level 1):** Tools MUST NOT:
 - Print credentials/tokens to stdout
@@ -465,7 +762,7 @@ $ api-client --agent --token abc123 get /users
 # stderr: {"error": "Request failed", "attempted_url": "https://api.example.com/users?token=[REDACTED]"}
 ```
 
-### 7.3 Audit Logging
+### 8.3 Audit Logging
 
 **Recommendation (Level 3):** Tools SHOULD support structured audit logs:
 
@@ -477,9 +774,9 @@ $ mytool --agent --audit-log ./audit.jsonl action
 
 ---
 
-## 8. Testing & Validation
+## 9. Testing & Validation
 
-### 8.1 Conformance Test Suite
+### 9.1 Conformance Test Suite
 
 A reference test suite is provided at `github.com/posix-agent-standard/tests`.
 
@@ -490,7 +787,7 @@ A reference test suite is provided at `github.com/posix-agent-standard/tests`.
 - **Pipe compatibility:** `tool --agent | jq` succeeds
 - **Error structure:** All errors are valid JSON
 
-### 8.2 Self-Validation
+### 9.2 Self-Validation
 
 Tools MAY implement `--validate-pas` to self-check conformance:
 
@@ -508,9 +805,9 @@ Conformance: Level 2 (Agent-Optimized)
 
 ---
 
-## 9. Migration Guide
+## 10. Migration Guide
 
-### 9.1 Adding `--agent` to Existing Tools
+### 10.1 Adding `--agent` to Existing Tools
 
 **Minimal implementation (Python example):**
 
@@ -558,7 +855,7 @@ if __name__ == '__main__':
     main()
 ```
 
-### 9.2 Replacing MCP Servers
+### 10.2 Replacing MCP Servers
 
 **Before (MCP wrapper):**
 ```python
@@ -592,14 +889,14 @@ $ weather-cli --agent --city "Boston"
 
 ---
 
-## 10. Governance & Evolution
+## 11. Governance & Evolution
 
-### 10.1 Reference Implementation
+### 11.1 Reference Implementation
 
 The official reference implementation is maintained at:
 **[github.com/posix-agent-standard/reference](https://github.com/posix-agent-standard/reference)**
 
-### 10.2 Versioning
+### 11.2 Versioning
 
 This specification uses Semantic Versioning:
 - **Major:** Breaking changes to core requirements
@@ -608,21 +905,21 @@ This specification uses Semantic Versioning:
 
 Current version: **0.1.0-draft** (pre-release)
 
-### 10.3 Contributing
+### 11.3 Contributing
 
 This is an open standard. Contributions welcome via:
 - GitHub issues for clarification requests
 - Pull requests for improvement proposals
 - Real-world case studies demonstrating impact
 
-### 10.4 Endorsements
+### 11.4 Endorsements
 
 Organizations implementing this standard:
 - *(List will be populated as adoption grows)*
 
 ---
 
-## 11. FAQ
+## 12. FAQ
 
 ### Q: Does this replace MCP?
 
@@ -660,7 +957,7 @@ Tools are just as dangerous whether called via MCP or CLI—the difference is th
 
 ---
 
-## 12. License
+## 13. License
 
 This specification is released under **CC BY 4.0**.
 
