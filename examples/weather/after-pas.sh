@@ -13,10 +13,10 @@
 # Token overhead: ~20 tokens (just "use weather --agent --city <name>")
 #
 # PAS Compliance: Level 2 (Agent-Optimized)
-# - ✅ --agent flag for deterministic behavior
+# - ✅ --agent flag as global modifier
+# - ✅ --agent --help for concise documentation
 # - ✅ JSON output
 # - ✅ Structured errors on stderr
-# - ✅ --help-agent concise documentation
 # - ✅ Semantic exit codes
 
 set -euo pipefail
@@ -37,16 +37,16 @@ Usage:
   weather [OPTIONS] --city <city>
 
 Options:
-  --agent          Output JSON for agent consumption
+  --agent          Enable agent mode (machine-readable output)
   --city <name>    City name (required)
   --units <type>   Units: metric (default) or imperial
-  --help-agent     Show agent-optimized help
   -h, --help       Show this help
 
 Examples:
   weather --city Boston
   weather --agent --city "New York"
   weather --agent --city London --units imperial
+  weather --agent --help                          # Agent documentation
 EOF
 }
 
@@ -151,8 +151,17 @@ get_weather() {
 # ============================================================================
 
 AGENT_MODE=false
+SHOW_HELP=false
 CITY=""
 UNITS="metric"
+
+# First pass: check for --agent flag
+for arg in "$@"; do
+    if [ "$arg" = "--agent" ]; then
+        AGENT_MODE=true
+        break
+    fi
+done
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -176,17 +185,18 @@ while [ $# -gt 0 ]; do
             fi
             shift 2
             ;;
-        --help-agent)
-            show_agent_help
-            exit 0
-            ;;
         -h|--help)
-            show_help
+            # If --agent was set, show agent help; otherwise show human help
+            if [ "$AGENT_MODE" = true ]; then
+                show_agent_help
+            else
+                show_help
+            fi
             exit 0
             ;;
         *)
             if [ "$AGENT_MODE" = true ]; then
-                echo '{"error":"INVALID_ARGUMENT","message":"Unknown option: '"$1"'","suggestion":"See --help"}' >&2
+                echo '{"error":"INVALID_ARGUMENT","message":"Unknown option: '"$1"'","suggestion":"See --agent --help"}' >&2
             else
                 echo "Error: Unknown option: $1" >&2
                 show_help >&2

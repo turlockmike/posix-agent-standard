@@ -140,9 +140,18 @@ These features make tools **non-deterministic** from an agent's perspective. The
 - Hang waiting for input
 - Require scrolling through paginated output
 
-### The Solution: The `--agent` Contract
+### The Solution: `--agent` as a Global Modifier
 
-We propose a single flag that enforces deterministic behavior.
+We propose a single flag that transforms the entire tool's behavior into **Strict Machine Mode**.
+
+**The key insight:** `--agent` is not just another flag—it's a **global modifier** that changes how ALL other flags behave, including `--help`.
+
+| Command | Output | Audience |
+|---------|--------|----------|
+| `tool --help` | Verbose tutorial, ASCII art, examples | **Human** |
+| `tool --agent --help` | Concise contract, strict types, no fluff | **Agent** |
+| `tool --list` | Pretty table, colors, headers | **Human** |
+| `tool --agent --list` | JSON Lines (NDJSON), no decoration | **Agent** |
 
 **Any tool implementing `--agent` MUST guarantee:**
 
@@ -177,6 +186,46 @@ $ deploy --agent
 # - No ANSI colors (unless explicitly --color=always)
 # - No pagination (full output to stdout)
 ```
+
+#### 4. Agent-Optimized Help
+```bash
+# Human help: verbose, educational
+$ weather --help
+Weather CLI v1.0.0
+================
+Get current weather conditions for any city worldwide!
+
+Usage: weather [OPTIONS] --city <name>
+
+Options:
+  --city <name>     City name (e.g., "Boston", "New York")
+  --units <type>    Temperature units: metric (default) or imperial
+  --help            Show this help message
+
+Examples:
+  weather --city Boston
+  weather --city "New York" --units imperial
+...
+
+# Agent help: concise contract
+$ weather --agent --help
+USAGE:
+  weather [--agent] --city <city> [--units metric|imperial]
+
+COMMON PATTERNS:
+  weather --agent --city Boston
+  weather --agent --city "New York" --units imperial
+
+ERROR CODES:
+  0   Success
+  100 City not found
+  101 API timeout
+
+ANTI-PATTERNS:
+  weather --city Boston    # Use --agent for machine-readable output
+```
+
+**Key difference:** Agents get the contract, not the tutorial.
 
 ### Data Format: JSON Lines (NDJSON)
 

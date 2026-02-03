@@ -226,7 +226,7 @@ $ users list --agent
 ### 3. Document concisely
 
 ```bash
-$ mytool --help-agent
+$ mytool --agent --help
 
 USAGE:
   mytool [--agent] <input>
@@ -343,8 +343,8 @@ Use when reviewing PRs or validating code changes.
 
 | Concern | Handled By | Benefit |
 |---------|-----------|---------|
-| Tool syntax & flags | CLI (`--help-agent`) | Single source of truth |
-| Common usage patterns | CLI (`--help-agent`) | Tools self-document |
+| Tool syntax & flags | CLI (`--agent --help`) | Single source of truth |
+| Common usage patterns | CLI (`--agent --help`) | Tools self-document |
 | Company policies | Skill | Encodes business logic |
 | Workflow orchestration | Skill | Focus on procedure |
 | Error handling | Both | CLI defines codes, Skill handles them |
@@ -370,7 +370,7 @@ Loads skill (50 lines, ~120 tokens)
     ↓
 Skill says: "Run eslint --agent on changed files"
     ↓
-Agent needs details → Runs: eslint --help-agent
+Agent needs details → Runs: eslint --agent --help
     ↓
 Gets concise docs (20 lines, ~50 tokens)
     ↓
@@ -389,7 +389,7 @@ With PAS tools as self-documenting primitives:
 - **"Pre-commit Check" skill** → Uses `eslint --agent`
 - **"CI Pipeline" skill** → Uses `eslint --agent`
 
-**Result:** Zero duplication. eslint documents itself once via `--help-agent`.
+**Result:** Zero duplication. eslint documents itself once via `--agent --help`.
 
 **[📖 Read the complete Skills guide →](./SKILLS.md)**
 

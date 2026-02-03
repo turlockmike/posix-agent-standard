@@ -32,7 +32,7 @@ $ mytool list --agent
 
 ### 3. Document concisely
 ```bash
-$ mytool --help-agent
+$ mytool --agent --help
 USAGE: mytool [--agent] <input>
 COMMON PATTERNS:
   mytool --agent file.txt    # Process file
@@ -135,7 +135,7 @@ AGENT_MODE=false
 while [ $# -gt 0 ]; do
     case "$1" in
         --agent) AGENT_MODE=true; shift ;;
-        --help-agent) show_agent_help; exit 0 ;;
+        --agent --help) show_agent_help; exit 0 ;;
         -h|--help) show_help; exit 0 ;;
         -*) echo '{"error":"INVALID_ARG","message":"Unknown: '"$1"'"}' >&2; exit 2 ;;
         *) break ;;
@@ -196,7 +196,7 @@ $ echo "file1.txt file2.txt" | xargs mytool --agent | jq -s .
 ### Test 5: Concise help
 ```bash
 # Should be < 50 lines
-$ mytool --help-agent | wc -l
+$ mytool --agent --help | wc -l
 ```
 
 ---
@@ -457,7 +457,7 @@ A: PAS works on Windows with PowerShell. The principles (JSON output, structured
 
 1. **`--agent` flag** → Non-interactive, JSON output, structured errors
 2. **JSON Lines format** → Streaming, pipe-friendly, works with `jq`
-3. **Concise help** → `--help-agent` for token efficiency
+3. **Concise help** → `--agent --help` for token efficiency
 
 **Result:** 88% less code, 95% fewer tokens, full composability.
 

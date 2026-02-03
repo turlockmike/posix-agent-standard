@@ -129,7 +129,7 @@ Hello, Alice!
 See `reference-implementations/word-counter.sh` for a fully-featured example demonstrating:
 
 - ✅ `--agent` mode with JSON Lines output
-- ✅ `--help-agent` concise documentation
+- ✅ `--agent --help` concise documentation
 - ✅ Structured error handling (stderr JSON)
 - ✅ Semantic exit codes
 - ✅ Proper file handling

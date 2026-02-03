@@ -67,9 +67,9 @@ This skill helps review code changes.
 
 Build your CLI tools to be **self-documenting** following PAS:
 
-**eslint (built-in tool with `--help-agent` added):**
+**eslint (built-in tool with `--agent --help` added):**
 ```bash
-$ eslint --help-agent
+$ eslint --agent --help
 USAGE:
   eslint [--agent] [--fix] <file...>
 
@@ -89,7 +89,7 @@ ANTI-PATTERNS:
 
 **pytest (with PAS compliance):**
 ```bash
-$ pytest --help-agent
+$ pytest --agent --help
 USAGE:
   pytest [--agent] [path]
 
@@ -224,8 +224,8 @@ Suggested fixes:
 - ✅ Warn about anti-patterns
 
 **Benefits:**
-- Used by humans directly (via `--help-agent`)
-- Used by agents directly (via `--help-agent`)
+- Used by humans directly (via `--agent --help`)
+- Used by agents directly (via `--agent --help`)
 - Used by ANY skill that needs it
 - Updated independently of skills
 - No duplication across skills
@@ -255,7 +255,7 @@ Suggested fixes:
 
 **`docker` (existing tool):**
 ```bash
-$ docker --help-agent
+$ docker --agent --help
 USAGE: docker [command] [options]
 COMMON PATTERNS:
   docker build --agent -t myapp:latest .
@@ -265,7 +265,7 @@ COMMON PATTERNS:
 
 **`aws` (existing tool):**
 ```bash
-$ aws --help-agent
+$ aws --agent --help
 USAGE: aws [service] [command] [options]
 COMMON PATTERNS:
   aws ecs update-service --agent --cluster prod --service myapp
@@ -274,7 +274,7 @@ COMMON PATTERNS:
 
 **`slack-cli` (your custom PAS tool):**
 ```bash
-$ slack-cli --help-agent
+$ slack-cli --agent --help
 USAGE: slack-cli post [--agent] --channel <name> --text <message>
 COMMON PATTERNS:
   slack-cli post --agent --channel deploys --text "Deploy started"
@@ -431,8 +431,8 @@ Total: ~950 lines loaded into agent context
 (50 lines)
 
 # Tools are consulted on-demand:
-- Agent runs: docker --help-agent (if needed)
-- Agent runs: aws ecs --help-agent (if needed)
+- Agent runs: docker --agent --help (if needed)
+- Agent runs: aws ecs --agent --help (if needed)
 
 Total: ~50 lines initially, tools loaded only when used
 ```
@@ -450,9 +450,9 @@ Result: Constant maintenance, frequent breakage
 
 **With PAS:**
 ```
-aws CLI adds new flag → aws --help-agent reflects it automatically
+aws CLI adds new flag → aws --agent --help reflects it automatically
 docker updates output format → docker --agent handles it transparently
-slack-cli changes authentication → slack-cli --help-agent explains new method
+slack-cli changes authentication → slack-cli --agent --help explains new method
 
 Result: Skills continue working, tools self-document
 ```
@@ -470,7 +470,7 @@ Result: Duplication across 3 skills
 
 **With PAS:**
 ```
-eslint --help-agent is the single source of truth
+eslint --agent --help is the single source of truth
 
 "Code Review" skill: workflow for PR reviews
 "Pre-Commit Check" skill: workflow for git hooks
@@ -487,7 +487,7 @@ Result: DRY (Don't Repeat Yourself)
 
 ✅ **DO:**
 - Implement `--agent` flag for deterministic output
-- Provide `--help-agent` with concise examples
+- Provide `--agent --help` with concise examples
 - Use semantic exit codes
 - Output structured data (JSON Lines)
 - Document anti-patterns to avoid
@@ -520,7 +520,7 @@ Loads relevant skill (50-200 lines)
     ↓
 Skill says: "Run docker build --agent"
     ↓
-Agent needs details → Runs: docker build --help-agent
+Agent needs details → Runs: docker build --agent --help
     ↓
 Gets concise docs (20-30 lines)
     ↓
@@ -559,13 +559,13 @@ These sections should be **deleted** and replaced with tool references.
 
 ### Step 2: Make Tools PAS-Compliant
 
-Add `--help-agent` to your custom tools:
+Add `--agent --help` to your custom tools:
 
 ```bash
 #!/bin/bash
 # deploy.sh
 
-if [ "$1" = "--help-agent" ]; then
+if [ "$1" = "--agent --help" ]; then
     cat << 'EOF'
 USAGE: deploy.sh --agent --env <prod|staging>
 
@@ -641,7 +641,7 @@ ERROR CODES:
 EOF
 }
 
-if [ "$1" = "--help-agent" ]; then
+if [ "$1" = "--agent --help" ]; then
     show_agent_help
     exit 0
 fi

@@ -31,7 +31,7 @@ A tool may claim conformance at one of three levels:
 ### Level 2: Agent-Optimized (Recommended)
 - Level 1 requirements, plus:
 - Outputs JSON Lines (NDJSON) for list data
-- Provides `--help-agent` or `.llm` documentation
+- Provides `--agent --help` or `.llm` documentation
 - Uses semantic exit codes
 
 ### Level 3: Agent-Native (Ideal)
@@ -44,9 +44,19 @@ A tool may claim conformance at one of three levels:
 
 ## 2. Core Requirements
 
-### 2.1 The Agent Flag
+### 2.1 The Agent Flag as Global Modifier
 
-**Requirement:** All conforming tools MUST provide a flag (recommended: `--agent`) that enforces deterministic behavior.
+**Requirement:** All conforming tools MUST provide a flag (recommended: `--agent`) that acts as a **global mode switch**.
+
+**Core concept:** `--agent` is not just another flag—it modifies the behavior of ALL other flags and subcommands, transforming the tool into **Strict Machine Mode**.
+
+**Examples:**
+| Command | Behavior |
+|---------|----------|
+| `tool --help` | Human manual (verbose, examples, ASCII art) |
+| `tool --agent --help` | Agent contract (concise, types, error codes) |
+| `tool list` | Pretty table with colors and headers |
+| `tool --agent list` | JSON Lines (NDJSON), no decoration |
 
 **Behavior when `--agent` is active:**
 
@@ -194,10 +204,10 @@ $ docs get --agent "API Authentication"
 - `64-78`: Reserved (see `sysexits.h` for traditional meanings)
 - `100-125`: Custom application errors (tool-specific)
 
-**Documentation:** Tools MUST document their exit codes in `--help-agent` output.
+**Documentation:** Tools MUST document their exit codes in `--agent --help` output.
 
 ```bash
-$ mytool --help-agent
+$ mytool --agent --help
 ...
 Exit Codes:
   0   Success
@@ -223,9 +233,9 @@ weather --agent --city "Boston" || {
 
 ## 4. Documentation Standard
 
-### 4.1 Agent-Optimized Help
+### 4.1 Agent-Optimized Help via `--agent --help`
 
-**Requirement (Level 2):** Tools SHOULD provide concise help via `--help-agent`.
+**Requirement (Level 2):** When both `--agent` and `--help` flags are present, tools SHOULD output a concise agent contract instead of the verbose human manual.
 
 **Structure:**
 ```
@@ -244,7 +254,7 @@ ANTI-PATTERNS:
 
 **Example:**
 ```bash
-$ git --help-agent
+$ git --agent --help
 USAGE:
   git <command> [options] [args]
 
@@ -266,7 +276,7 @@ ANTI-PATTERNS:
   git add .            # May include unintended files; be specific
 ```
 
-**Rationale:** Standard `--help` is optimized for human browsing (verbose, formatted). `--help-agent` is optimized for context window efficiency.
+**Rationale:** Standard `--help` is optimized for human browsing (verbose, formatted). `--agent --help` is optimized for context window efficiency.
 
 ### 4.2 LLM Documentation Files (Optional, Level 3)
 
@@ -446,7 +456,7 @@ $ mytool --validate-pas
 ✓ Produces valid JSON Lines output
 ✓ Structured errors on stderr
 ✓ Non-interactive mode works
-✓ Documentation via --help-agent available
+✓ Documentation via --agent --help available
 ⚠ Warning: No .llm file provided (Level 3 optional)
 
 Conformance: Level 2 (Agent-Optimized)
@@ -636,7 +646,7 @@ Usage: word-counter [OPTIONS] <file...>
 
 Options:
   --agent          Agent-compatible output (JSON Lines)
-  --help-agent     Show agent-optimized help
+  --agent --help     Show agent-optimized help
   -h, --help       Show this help
 
 Examples:
@@ -704,7 +714,7 @@ while [ $# -gt 0 ]; do
             AGENT_MODE=true
             shift
             ;;
-        --help-agent)
+        --agent --help)
             agent_help
             exit 0
             ;;

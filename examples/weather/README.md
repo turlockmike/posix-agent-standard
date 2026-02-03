@@ -173,7 +173,7 @@ This example demonstrates the difference between building an agent tool using th
 1. **Argument Parsing** (Lines 102-141)
    - `--agent` flag handling
    - `--city` and `--units` parameters
-   - `--help-agent` for concise docs
+   - `--agent --help` for concise docs
 
 2. **Core Logic** (Lines 43-100)
    - `get_weather()` function (60 lines total)
@@ -184,7 +184,7 @@ This example demonstrates the difference between building an agent tool using th
 
 3. **Help Documentation** (Lines 18-41)
    - Human-readable `--help`
-   - Agent-optimized `--help-agent`
+   - Agent-optimized `--agent --help`
 
 ### How the Agent Uses It
 
